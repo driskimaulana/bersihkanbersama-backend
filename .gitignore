@@ -17,5 +17,7 @@
 # Dependency directories
 vendor/
 
+tmp
+
 # env
 .env
