@@ -12,6 +12,7 @@ func main() {
 	// connect to database
 	configs.ConnectDB()
 	routes.UserRoute(router)
+	routes.AuthenticationRoute(router)
 	err := router.Run("localhost:5000")
 	if err != nil {
 		return
