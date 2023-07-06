@@ -1,0 +1,10 @@
+# Build artifacts
+*.o
+*.a
+
+# Compiled binaries
+bin/
+exe/
+
+# Dependency directories
+vendor/

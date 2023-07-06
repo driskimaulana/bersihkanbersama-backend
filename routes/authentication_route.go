@@ -7,6 +7,8 @@ import (
 )
 
 func AuthenticationRoute(router *gin.Engine) {
-	router.POST("/signup", controllers.SignUp())
-	router.POST("/signin", controllers.SignIn())
+	router.POST("/user/signup", controllers.SignUp())
+	router.POST("/user/signin", controllers.SignIn())
+	router.POST("/organization/signup", controllers.RegisterOrganization())
+	router.POST("/organization/signin", controllers.SignInOrganization())
 }

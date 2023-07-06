@@ -9,6 +9,7 @@ type User struct {
 	Id        primitive.ObjectID `bson:"_id,omitempty"`
 	Name      string             `bson:"name,omitempty" validate:"required"`
 	Phone     string             `bson:"phone,omitempty" validate:"required"`
+	Role      string             `bson:"role,omitempty" validate:"required"`
 	Email     string             `bson:"email,omitempty" validate:"required"`
 	Password  string             `bson:"password,omitempty" validate:"required"`
 	Address   Address            `bson:"address,omitempty"`
@@ -27,13 +28,13 @@ type Address struct {
 }
 
 type Points struct {
-	TotalPoints  float64      `bson:"totalPoints" validate:"required"`
-	PointHistory PointHistory `bson:"pointOutHistory,omitempty"`
+	TotalPoints  int            `bson:"totalPoints" validate:"required"`
+	PointHistory []PointHistory `bson:"pointHistory,omitempty"`
 }
 
 type PointHistory struct {
 	ProductName string    `bson:"productName"`
-	PointOut    float64   `bson:"pointOut" validate:"required"`
-	PointIn     float64   `bson:"pointIn" validate:"required"`
+	PointOut    int       `bson:"pointOut" validate:"required"`
+	PointIn     int       `bson:"pointIn" validate:"required"`
 	CreatedAt   time.Time `bson:"createdAt" validate:"required"`
 }
