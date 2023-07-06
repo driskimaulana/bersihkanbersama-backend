@@ -14,6 +14,7 @@ func main() {
 	configs.ConnectDB()
 	routes.UserRoute(router)
 	routes.AuthenticationRoute(router)
+	routes.ActivityRoute(router)
 
 	PORT := os.Getenv("PORT")
 	err := router.Run(":" + PORT)
