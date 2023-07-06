@@ -51,6 +51,7 @@ func CreateNewActivity() gin.HandlerFunc {
 		}
 
 		imageUrl, err := services.UploadImage(c)
+		fmt.Println(err)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.UserResponse{
 				Status:  http.StatusInternalServerError,

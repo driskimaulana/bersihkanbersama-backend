@@ -33,7 +33,7 @@ func UploadImage(c *gin.Context) (string, error) {
 			fmt.Println(err.Error())
 		}
 	}(fileHandle)
-	fmt.Println("3")
+	fmt.Println("3" + file.Filename)
 
 	result, err := cld.Upload.Upload(ctx, fileHandle, uploader.UploadParams{
 		Folder: "bersihkanbersama",
