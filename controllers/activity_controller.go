@@ -59,6 +59,8 @@ func CreateNewActivity() gin.HandlerFunc {
 			return
 		}
 
+		fmt.Println(imageUrl)
+
 		participation, err := strconv.Atoi(c.PostForm("participationRewards"))
 		first, err := strconv.Atoi(c.PostForm("firstRewards"))
 		second, err := strconv.Atoi(c.PostForm("secondRewards"))
