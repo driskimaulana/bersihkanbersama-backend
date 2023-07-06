@@ -11,6 +11,9 @@ env:
   REPOSITORY: ${{ secrets.GCP_ARTIFACT_REPOSITORY }}
   API_SECRET: ${{ secrets.API_SECRET }}
   MONGOURI: ${{ secrets.MONGOURI}}
+  CLOUDINARY_API_SECRET: ${{ secrets.API_SECRET}}
+  CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY}}
+  CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME}}
 
 jobs:
   deploy:
@@ -45,7 +48,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         id: deploy
-        run: gcloud run deploy ${{ env.SERVICE }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated --max-instances=5 --set-env-vars MONGOURI=${{ env.MONGOURI }},API_SECRET=${{ env.API_SECRET }}
+        run: gcloud run deploy ${{ env.SERVICE }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated --max-instances=5 --set-env-vars MONGOURI=${{ env.MONGOURI }},API_SECRET=${{ env.API_SECRET }},CLOUDINARY_API_SECRET=${{ env.CLOUDINARY_API_SECRET }},CLOUDINARY_API_KEY=${{ env.CLOUDINARY_API_KEY }},CLOUDINARY_NAME=${{ env.CLOUDINARY_NAME }}
 
       # If required, use the Cloud Run url output in later steps
       - name: Show Output
