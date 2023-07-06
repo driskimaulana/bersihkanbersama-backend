@@ -45,7 +45,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         id: deploy
-        run: gcloud run deploy ${{ env.SERVICE }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated --max-instances=5
+        run: gcloud run deploy ${{ env.SERVICE }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated --max-instances=5 --set-env-vars MONGOURI=${{ env.MONGOURI }},API_SECRET=${{ env.API_SECRET }}
 
       # If required, use the Cloud Run url output in later steps
       - name: Show Output
