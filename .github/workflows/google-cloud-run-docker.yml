@@ -9,6 +9,8 @@ env:
   SERVICE: ${{ secrets.GCP_SERVICE_NAME }} # TODO: update Cloud Run service name
   REGION: ${{ secrets.GCP_REGION }} # TODO: update Cloud Run service region
   REPOSITORY: ${{ secrets.GCP_ARTIFACT_REPOSITORY }}
+  API_SECRET: ${{ secrets.API_SECRET }}
+  MONGOURI: ${{ secrets.MONGOURI}}
 
 jobs:
   deploy:
@@ -43,7 +45,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         id: deploy
-        run: gcloud run deploy ${{ env.SERVICE }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated --max-instances=5
+        run: gcloud run deploy ${{ env.SERVICE }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated --max-instances=5 --set-env-vars MONGO_URI=${{ env.MONGOURI }},API_SECRET=${{ env.API_SECRET }},PORT=8080
 
       # If required, use the Cloud Run url output in later steps
       - name: Show Output
