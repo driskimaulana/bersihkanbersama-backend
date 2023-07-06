@@ -4,6 +4,7 @@ import (
 	"bersihkanbersama-backend/configs"
 	"bersihkanbersama-backend/routes"
 	"github.com/gin-gonic/gin"
+	"os"
 )
 
 func main() {
@@ -13,7 +14,9 @@ func main() {
 	configs.ConnectDB()
 	routes.UserRoute(router)
 	routes.AuthenticationRoute(router)
-	err := router.Run("localhost:5000")
+
+	PORT := os.Getenv("PORT")
+	err := router.Run(":" + PORT)
 	if err != nil {
 		return
 	}
