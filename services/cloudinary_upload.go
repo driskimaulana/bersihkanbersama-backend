@@ -14,6 +14,7 @@ import (
 var cld, _ = cloudinary.NewFromParams(os.Getenv("CLOUDINARY_NAME"), os.Getenv("CLOUDINARY_API_KEY"), os.Getenv("CLOUDINARY_API_SECRET"))
 
 func UploadImage(c *gin.Context) (string, error) {
+	fmt.Println("1")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	file, err := c.FormFile("coverImage")
@@ -32,6 +33,7 @@ func UploadImage(c *gin.Context) (string, error) {
 			fmt.Println(err.Error())
 		}
 	}(fileHandle)
+	fmt.Println("3")
 
 	result, err := cld.Upload.Upload(ctx, fileHandle, uploader.UploadParams{
 		Folder: "bersihkanbersama",
@@ -40,6 +42,7 @@ func UploadImage(c *gin.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("2")
 
 	fmt.Println(result.URL)
 

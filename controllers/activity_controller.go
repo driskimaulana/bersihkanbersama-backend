@@ -29,17 +29,17 @@ func CreateNewActivity() gin.HandlerFunc {
 			})
 			return
 		}
-		//err = c.Request.ParseMultipartForm(1028 << 20)
-		//if err != nil {
-		//	c.JSON(http.StatusUnauthorized, responses.UserResponse{
-		//		Status:  http.StatusUnauthorized,
-		//		Message: "Error! Failed to parse form data.",
-		//		Data: map[string]interface{}{
-		//			"error": err.Error(),
-		//		},
-		//	})
-		//	return
-		//}
+		err = c.Request.ParseMultipartForm(1028 << 20)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, responses.UserResponse{
+				Status:  http.StatusUnauthorized,
+				Message: "Error! Failed to parse form data.",
+				Data: map[string]interface{}{
+					"error": err.Error(),
+				},
+			})
+			return
+		}
 
 		organizationId, err := primitive.ObjectIDFromHex(stringId)
 		if err != nil {
@@ -58,8 +58,7 @@ func CreateNewActivity() gin.HandlerFunc {
 			})
 			return
 		}
-
-		fmt.Println(imageUrl)
+		fmt.Println("5")
 
 		participation, err := strconv.Atoi(c.PostForm("participationRewards"))
 		first, err := strconv.Atoi(c.PostForm("firstRewards"))
