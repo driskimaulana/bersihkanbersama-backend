@@ -7,11 +7,10 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gin-gonic/gin"
 	"mime/multipart"
-	"os"
 	"time"
 )
 
-var cld, _ = cloudinary.NewFromParams(os.Getenv("CLOUDINARY_NAME"), os.Getenv("CLOUDINARY_API_KEY"), os.Getenv("CLOUDINARY_API_SECRET"))
+var cld, _ = cloudinary.NewFromParams("dscbb3cu2", "236375965318535", "rMTpUebQW7YudNxweG2na60Tqfs")
 
 func UploadImage(c *gin.Context) (string, error) {
 	fmt.Println("1")
@@ -44,7 +43,7 @@ func UploadImage(c *gin.Context) (string, error) {
 	}
 	fmt.Println("2")
 
-	fmt.Println(result.URL)
+	fmt.Println(result)
 
 	return result.URL, nil
 }
