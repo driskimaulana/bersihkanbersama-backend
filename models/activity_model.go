@@ -41,7 +41,7 @@ type UserRegistered struct {
 type Team struct {
 	Name         string           `bson:"name" validate:"required"`
 	Members      []UserRegistered `bson:"members" validate:"required"`
-	TrashResults float32          `bson:"trashResult" validate:"required"`
+	TrashResults float64          `bson:"trashResult" validate:"required"`
 }
 
 type Rewards struct {

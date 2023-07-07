@@ -40,7 +40,7 @@ func SignUp() gin.HandlerFunc {
 		defer cancel()
 		// validate the required fields
 		if validateErr := validate.Struct(&input); validateErr != nil {
-			c.JSON(http.StatusBadRequest, responses.UserResponse{
+			c.JSON(http.StatusBadRequest, responses.ResponseWithData{
 				Status:  http.StatusBadRequest,
 				Message: "Error! Required field is empty.",
 				Data:    map[string]interface{}{"data": validateErr.Error()}},
@@ -52,7 +52,7 @@ func SignUp() gin.HandlerFunc {
 		var prevUser bson.D
 		err := userCollection.FindOne(ctx, bson.D{{"email", input.Email}}).Decode(&prevUser)
 		if len(prevUser) != 0 {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Email is already in use.",
 			})
@@ -62,7 +62,7 @@ func SignUp() gin.HandlerFunc {
 		// check the phone number is already in use
 		err = userCollection.FindOne(ctx, bson.D{{"phone", input.Phone}}).Decode(&prevUser)
 		if len(prevUser) != 0 {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Phone number is already in use.",
 			})
@@ -71,7 +71,7 @@ func SignUp() gin.HandlerFunc {
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Failed to hash password.",
 				Data: map[string]interface{}{
@@ -88,8 +88,10 @@ func SignUp() gin.HandlerFunc {
 			Role:     "User",
 			Password: string(hashedPassword),
 			Points: models.Points{
-				TotalPoints: 0.0,
+				TotalPoints:  0.0,
+				PointHistory: []models.PointHistory{},
 			},
+			Activity:  []primitive.ObjectID{},
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
@@ -97,7 +99,7 @@ func SignUp() gin.HandlerFunc {
 
 		result, err := userCollection.InsertOne(ctx, newUser)
 		if err != nil {
-			c.JSON(http.StatusNotAcceptable, responses.UserResponse{
+			c.JSON(http.StatusNotAcceptable, responses.ResponseWithData{
 				Status:  http.StatusNotAcceptable,
 				Message: "Error! Failed to save data to database.",
 				Data: map[string]interface{}{
@@ -110,7 +112,7 @@ func SignUp() gin.HandlerFunc {
 		token, err := utils.GenerateToken(newUser.Id)
 
 		if err != nil {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Failed to generate login token.",
 				Data: map[string]interface{}{
@@ -120,7 +122,7 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, responses.UserResponse{
+		c.JSON(http.StatusCreated, responses.ResponseWithData{
 			Status:  http.StatusCreated,
 			Message: "Success! Register success.",
 			Data: map[string]interface{}{
@@ -152,7 +154,7 @@ func SignIn() gin.HandlerFunc {
 
 		// validate the required fields
 		if validateErr := validate.Struct(&input); validateErr != nil {
-			c.JSON(http.StatusBadRequest, responses.UserResponse{
+			c.JSON(http.StatusBadRequest, responses.ResponseWithData{
 				Status:  http.StatusBadRequest,
 				Message: "Error! Required field is empty.",
 				Data:    map[string]interface{}{"data": validateErr.Error()}},
@@ -164,7 +166,7 @@ func SignIn() gin.HandlerFunc {
 		//var prevUser bson.D
 		err := userCollection.FindOne(ctx, bson.D{{"email", input.Email}}).Decode(&u)
 		if err != nil {
-			c.JSON(http.StatusNotFound, responses.UserResponse{
+			c.JSON(http.StatusNotFound, responses.ResponseWithData{
 				Status:  http.StatusNotFound,
 				Message: "Error! Email is not found.",
 			})
@@ -174,7 +176,7 @@ func SignIn() gin.HandlerFunc {
 		err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(input.Password))
 
 		if err != nil {
-			c.JSON(http.StatusNotFound, responses.UserResponse{
+			c.JSON(http.StatusNotFound, responses.ResponseWithData{
 				Status:  http.StatusNotFound,
 				Message: "Error! Password is incorrect.",
 			})
@@ -184,7 +186,7 @@ func SignIn() gin.HandlerFunc {
 		token, err := utils.GenerateToken(u.Id)
 
 		if err != nil {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Failed to generate login token.",
 				Data: map[string]interface{}{
@@ -194,7 +196,7 @@ func SignIn() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, responses.UserResponse{
+		c.JSON(http.StatusOK, responses.ResponseWithData{
 			Status:  http.StatusOK,
 			Message: "Success! Login success.",
 			Data: map[string]interface{}{
@@ -227,7 +229,7 @@ func RegisterOrganization() gin.HandlerFunc {
 		defer cancel()
 		// validate the required fields
 		if validateErr := validate.Struct(&input); validateErr != nil {
-			c.JSON(http.StatusBadRequest, responses.UserResponse{
+			c.JSON(http.StatusBadRequest, responses.ResponseWithData{
 				Status:  http.StatusBadRequest,
 				Message: "Error! Required field is empty.",
 				Data:    map[string]interface{}{"data": validateErr.Error()}},
@@ -239,7 +241,7 @@ func RegisterOrganization() gin.HandlerFunc {
 		var prevUser bson.D
 		err := userCollection.FindOne(ctx, bson.D{{"email", input.Email}}).Decode(&prevUser)
 		if len(prevUser) != 0 {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Email is already in use.",
 			})
@@ -248,7 +250,7 @@ func RegisterOrganization() gin.HandlerFunc {
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Failed to hash password.",
 				Data: map[string]interface{}{
@@ -275,7 +277,7 @@ func RegisterOrganization() gin.HandlerFunc {
 
 		result, err := organizationCollection.InsertOne(ctx, newOrganization)
 		if err != nil {
-			c.JSON(http.StatusNotAcceptable, responses.UserResponse{
+			c.JSON(http.StatusNotAcceptable, responses.ResponseWithData{
 				Status:  http.StatusNotAcceptable,
 				Message: "Error! Failed to save data to database.",
 				Data: map[string]interface{}{
@@ -288,7 +290,7 @@ func RegisterOrganization() gin.HandlerFunc {
 		token, err := utils.GenerateToken(newOrganization.Id)
 
 		if err != nil {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Failed to generate login token.",
 				Data: map[string]interface{}{
@@ -298,7 +300,7 @@ func RegisterOrganization() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, responses.UserResponse{
+		c.JSON(http.StatusCreated, responses.ResponseWithData{
 			Status:  http.StatusCreated,
 			Message: "Success! Register success.",
 			Data: map[string]interface{}{
@@ -325,7 +327,7 @@ func SignInOrganization() gin.HandlerFunc {
 
 		// validate the required fields
 		if validateErr := validate.Struct(&input); validateErr != nil {
-			c.JSON(http.StatusBadRequest, responses.UserResponse{
+			c.JSON(http.StatusBadRequest, responses.ResponseWithData{
 				Status:  http.StatusBadRequest,
 				Message: "Error! Required field is empty.",
 				Data:    map[string]interface{}{"data": validateErr.Error()}},
@@ -337,7 +339,7 @@ func SignInOrganization() gin.HandlerFunc {
 		//var prevUser bson.D
 		err := organizationCollection.FindOne(ctx, bson.D{{"email", input.Email}}).Decode(&u)
 		if err != nil {
-			c.JSON(http.StatusNotFound, responses.UserResponse{
+			c.JSON(http.StatusNotFound, responses.ResponseWithData{
 				Status:  http.StatusNotFound,
 				Message: "Error! Email is not found.",
 			})
@@ -347,7 +349,7 @@ func SignInOrganization() gin.HandlerFunc {
 		err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(input.Password))
 
 		if err != nil {
-			c.JSON(http.StatusNotFound, responses.UserResponse{
+			c.JSON(http.StatusNotFound, responses.ResponseWithData{
 				Status:  http.StatusNotFound,
 				Message: "Error! Password is incorrect.",
 			})
@@ -357,7 +359,7 @@ func SignInOrganization() gin.HandlerFunc {
 		token, err := utils.GenerateToken(u.Id)
 
 		if err != nil {
-			c.JSON(http.StatusFailedDependency, responses.UserResponse{
+			c.JSON(http.StatusFailedDependency, responses.ResponseWithData{
 				Status:  http.StatusFailedDependency,
 				Message: "Error! Failed to generate login token.",
 				Data: map[string]interface{}{
@@ -367,7 +369,7 @@ func SignInOrganization() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, responses.UserResponse{
+		c.JSON(http.StatusOK, responses.ResponseWithData{
 			Status:  http.StatusOK,
 			Message: "Success! Login success.",
 			Data: map[string]interface{}{
