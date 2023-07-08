@@ -6,19 +6,19 @@ import (
 )
 
 type Activity struct {
-	Id             primitive.ObjectID `bson:"_id"`
-	OrganizationId primitive.ObjectID `bson:"organizationId" validate:"required"`
-	Title          string             `bson:"title" validate:"required"`
-	Description    string             `bson:"description" validate:"required"`
-	EventDate      string             `bson:"eventDate" validate:"required"`
-	Location       Location           `bson:"location" validate:"required"`
-	CoverImage     string             `bson:"coverImage"`
-	Volunteer      Volunteer          `bson:"volunteer"`
-	Status         string             `bson:"status" validate:"required"`
-	Rewards        Rewards            `bson:"rewards" validate:"required"`
-	Donation       Donation           `bson:"donation" validate:"required"`
-	CreatedAt      time.Time          `bson:"createdAt" validate:"required"`
-	UpdatedAt      time.Time          `bson:"updatedAt" validate:"required"`
+	Id               primitive.ObjectID `bson:"_id"`
+	OrganizationId   primitive.ObjectID `bson:"organizationId" validate:"required"`
+	Title            string             `bson:"title" validate:"required"`
+	Description      string             `bson:"description" validate:"required"`
+	EventDate        string             `bson:"eventDate" validate:"required"`
+	Location         Location           `bson:"location" validate:"required"`
+	CoverImage       string             `bson:"coverImage"`
+	Volunteer        Volunteer          `bson:"volunteer"`
+	Status           string             `bson:"status" validate:"required"`
+	Rewards          Rewards            `bson:"rewards" validate:"required"`
+	DonationActivity DonationActivity   `bson:"donationActivity" validate:"required"`
+	CreatedAt        time.Time          `bson:"createdAt" validate:"required"`
+	UpdatedAt        time.Time          `bson:"updatedAt" validate:"required"`
 }
 
 type Location struct {
@@ -53,23 +53,14 @@ type Rewards struct {
 	Third         int `bson:"third" validate:"required"`
 }
 
-type Donation struct {
-	TotalDonation    float64           `bson:"totalDonation" validate:"required"`
-	ReceivedDonation []DonationItem    `bson:"receivedDonation"`
-	DonationHistory  []DonationHistory `bson:"donationHistory"`
+type DonationActivity struct {
+	TotalDonation   float64           `bson:"totalDonation" validate:"required"`
+	DonationHistory []DonationSummary `bson:"donationHistory"`
+	//ReceivedDonation []DonationItem `bson:"receivedDonation"`
 }
 
-type DonationHistory struct {
-	Id            primitive.ObjectID `bson:"id" validate:"required"`
-	UserId        primitive.ObjectID `bson:"userId" validate:"required"`
-	Items         []DonationItem     `bson:"items" validate:"required"`
-	TotalDonation float64            `bson:"totalDonation" validate:"required"`
-	PaymentId     string             `bson:"paymentId" validate:"required"`
-	IsAnonim      bool               `bson:"isAnonim" validate:"required"`
-	UserName      string             `bson:"userName" validate:"required"`
-}
-
-type DonationItem struct {
-	Name  string `bson:"type" validate:"required"`
-	Count int    `bson:"count" validate:"required"`
+type DonationSummary struct {
+	DonationId    primitive.ObjectID `bson:"donationId"`
+	UserName      string             `bson:"userName"`
+	TotalDonation float64            `bson:"totalDonation"`
 }

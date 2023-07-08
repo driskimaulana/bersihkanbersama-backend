@@ -16,4 +16,6 @@ func ActivityRoute(router *gin.Engine) {
 	router.PUT("/activity/teamresults/:activityId", middlewares.JwtAuthMiddleware(), controllers.AddTeamTrashResult())
 	router.PUT("/activity/finish/:activityId", middlewares.JwtAuthMiddleware(), controllers.FinishActivity())
 	router.GET("/activity/leaderboard/:activityId", controllers.Leaderboard())
+	router.POST("/activity/donate/:activityId", controllers.CreateNewDonation())
+	router.GET("/activity/donate/details/:donationId", controllers.GetPaymentDetails())
 }

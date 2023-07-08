@@ -88,10 +88,10 @@ func CreateNewActivity() gin.HandlerFunc {
 				Second:        second,
 				Third:         third,
 			},
-			Donation: models.Donation{
-				TotalDonation:    0.0,
-				ReceivedDonation: []models.DonationItem{},
-				DonationHistory:  []models.DonationHistory{},
+			DonationActivity: models.DonationActivity{
+				TotalDonation:   0.0,
+				DonationHistory: []models.DonationSummary{},
+				//ReceivedDonation: []models.DonationItem{},
 			},
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -225,6 +225,14 @@ func StartActivity() gin.HandlerFunc {
 			return
 		}
 
+		if activity.Status == "Started" {
+			c.JSON(http.StatusForbidden, responses.ResponseNoData{
+				Status:  http.StatusForbidden,
+				Message: "Forbidden! Activity already started.",
+			})
+			return
+		}
+
 		activity.Volunteer.Teams = *utils.RandomizeTeam(activity.Volunteer)
 
 		_, err = activityCollection.UpdateOne(ctx, bson.M{"_id": objId},
@@ -240,6 +248,8 @@ func StartActivity() gin.HandlerFunc {
 			})
 			return
 		}
+
+		activity.Status = "Started"
 
 		c.JSON(http.StatusOK, responses.ResponseWithData{
 			Status:  http.StatusOK,
@@ -293,6 +303,22 @@ func RegisterToActivity() gin.HandlerFunc {
 			return
 		}
 
+		isExist := false
+		for _, registered := range activity.Volunteer.UserRegistered {
+			if registered.Id == userObjId {
+				isExist = true
+				break
+			}
+		}
+
+		if isExist {
+			c.JSON(http.StatusForbidden, responses.ResponseNoData{
+				Status:  http.StatusForbidden,
+				Message: "Forbidden! You already register.",
+			})
+			return
+		}
+
 		err = userCollection.FindOne(ctx, bson.M{"_id": userObjId}).Decode(&user)
 		if err != nil {
 			c.JSON(http.StatusNotFound, responses.ResponseWithData{
@@ -307,7 +333,7 @@ func RegisterToActivity() gin.HandlerFunc {
 
 		userToRegister := models.UserRegistered{
 			Id:    user.Id,
-			Name:  "Jimbei",
+			Name:  user.Name,
 			Phone: user.Phone,
 		}
 
@@ -431,13 +457,33 @@ func FinishActivity() gin.HandlerFunc {
 			return
 		}
 
+		if activity.Status == "Finished" {
+			c.JSON(http.StatusForbidden, responses.ResponseNoData{
+				Status:  http.StatusForbidden,
+				Message: "Forbidden! Activity already finish.",
+			})
+			return
+		}
+
+		activity.Status = "Finished"
+		_, err = activityCollection.UpdateOne(ctx, bson.M{"_id": activity.Id}, bson.M{"$set": bson.M{"status": activity.Status}})
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, responses.ResponseWithData{
+				Status:  http.StatusServiceUnavailable,
+				Message: "Error! Failed to change activity status.",
+				Data: map[string]interface{}{
+					"data": err.Error(),
+				},
+			})
+			return
+		}
 		teams := activity.Volunteer.Teams
 		sort.Slice(teams, func(i, j int) bool {
 			return teams[i].TrashResults > teams[j].TrashResults
 		})
 
-		var u models.User
 		for _, registered := range activity.Volunteer.UserRegistered {
+			var u models.User
 			err = userCollection.FindOne(ctx, bson.M{"_id": registered.Id}).Decode(&u)
 			if err != nil {
 				c.JSON(http.StatusNotFound, responses.ResponseWithData{
@@ -471,6 +517,7 @@ func FinishActivity() gin.HandlerFunc {
 						Title:     "Reward Juara Satu",
 						CreatedAt: time.Now(),
 					})
+					break
 				}
 			}
 			// send second place reward
@@ -483,6 +530,7 @@ func FinishActivity() gin.HandlerFunc {
 						Title:     "Reward Juara Dua",
 						CreatedAt: time.Now(),
 					})
+					break
 				}
 			}
 			if len(teams) > 2 {
@@ -496,6 +544,7 @@ func FinishActivity() gin.HandlerFunc {
 							Title:     "Reward Juara Tiga",
 							CreatedAt: time.Now(),
 						})
+						break
 					}
 				}
 			}
