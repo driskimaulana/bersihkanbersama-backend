@@ -7,7 +7,6 @@ import (
 	"bersihkanbersama-backend/services"
 	"bersihkanbersama-backend/utils"
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -53,7 +52,6 @@ func CreateNewActivity() gin.HandlerFunc {
 		}
 
 		imageUrl, err := services.UploadImage(c)
-		fmt.Println(err)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ResponseWithData{
 				Status:  http.StatusInternalServerError,
@@ -61,7 +59,6 @@ func CreateNewActivity() gin.HandlerFunc {
 			})
 			return
 		}
-		fmt.Println("5")
 
 		participation, err := strconv.Atoi(c.PostForm("participationRewards"))
 		first, err := strconv.Atoi(c.PostForm("firstRewards"))
@@ -76,8 +73,8 @@ func CreateNewActivity() gin.HandlerFunc {
 			Description:    c.PostForm("description"),
 			EventDate:      c.PostForm("eventDate"),
 			Location: models.Location{
-				Latitude:  c.PostForm("latitude"),
-				Longitude: c.PostForm("longitude"),
+				City:        c.PostForm("city"),
+				FullAddress: c.PostForm("fullAddress"),
 			},
 			Volunteer: models.Volunteer{
 				Count:          0,
@@ -100,7 +97,6 @@ func CreateNewActivity() gin.HandlerFunc {
 			UpdatedAt: time.Now(),
 		}
 
-		fmt.Println(c.PostForm("title"))
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
@@ -506,7 +502,7 @@ func FinishActivity() gin.HandlerFunc {
 
 			update := bson.M{
 				"points":    u.Points,
-				"history":   u.Activity,
+				"activity":  u.Activity,
 				"updatedAt": u.UpdatedAt,
 			}
 

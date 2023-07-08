@@ -22,8 +22,10 @@ type Activity struct {
 }
 
 type Location struct {
-	Latitude  string `bson:"latitude" validate:"required"`
-	Longitude string `bson:"longitude" validate:"required"`
+	City        string `bson:"city"`
+	FullAddress string `bson:"fullAddress"`
+	Latitude    string `bson:"latitude"`
+	Longitude   string `bson:"longitude"`
 }
 
 type Volunteer struct {
