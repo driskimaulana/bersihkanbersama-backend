@@ -20,7 +20,7 @@ var donationCollection *mongo.Collection = configs.GetCollection(configs.Connect
 
 type NewDonationInput struct {
 	Items    []models.DonationItem `json:"items" validate:"required"`
-	IsAnonim bool                  `json:"isAnonim" validate:"required"`
+	IsAnonim bool                  `json:"isAnonim"`
 }
 
 func CreateNewDonation() gin.HandlerFunc {
