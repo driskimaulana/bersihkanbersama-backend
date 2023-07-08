@@ -31,13 +31,15 @@ type RegisterInput struct {
 func SignUp() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		var input RegisterInput
 		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status": "failed",
-				"error":  err.Error()})
+			c.JSON(http.StatusBadRequest, responses.ResponseNoData{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
+			})
+			return
 		}
-		defer cancel()
 		// validate the required fields
 		if validateErr := validate.Struct(&input); validateErr != nil {
 			c.JSON(http.StatusBadRequest, responses.ResponseWithData{
@@ -142,15 +144,15 @@ type SignInInput struct {
 func SignIn() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		var input SignInInput
 		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status": "failed",
-				"error":  err.Error(),
+			c.JSON(http.StatusBadRequest, responses.ResponseNoData{
+				Status:  http.StatusBadRequest,
+				Message: err.Error(),
 			})
 			return
 		}
-		defer cancel()
 
 		// validate the required fields
 		if validateErr := validate.Struct(&input); validateErr != nil {

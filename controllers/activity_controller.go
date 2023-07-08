@@ -32,8 +32,8 @@ func CreateNewActivity() gin.HandlerFunc {
 		}
 		err = c.Request.ParseMultipartForm(1028 << 20)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, responses.ResponseWithData{
-				Status:  http.StatusUnauthorized,
+			c.JSON(http.StatusServiceUnavailable, responses.ResponseWithData{
+				Status:  http.StatusServiceUnavailable,
 				Message: "Error! Failed to parse form data.",
 				Data: map[string]interface{}{
 					"error": err.Error(),

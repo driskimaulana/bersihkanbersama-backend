@@ -19,6 +19,7 @@ func main() {
 	routes.AuthenticationRoute(router)
 	routes.ActivityRoute(router)
 	routes.WebhooksRoute(router)
+	routes.ArticleRoute(router)
 
 	PORT := os.Getenv("PORT")
 	err := router.Run(":" + PORT)
